@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import logo from './logo.svg';
 import './App.css';
-import { getCountriesAndThreatLevels } from './redux/App.redux';
+import { getCountriesAndThreatLevels,addUserWishListCountry } from './redux/App.redux';
 
 import { GET_COUNTIRES_AND_THREAT_LEVELS_URL } from './constants/API';
 
@@ -19,10 +19,12 @@ class App extends Component {
   }
 
   componentDidMount() {
+    // Method to get the country and threat level data and store into "Redux Store"
     this.props.getCountriesAndThreatLevels(GET_COUNTIRES_AND_THREAT_LEVELS_URL);
   }
 
   bindCountriesToDropDown() {
+    // Render dropdown options.
     const { countries } = this.props;
     return countries.map(s => {
       return (<option key={"c" + s.id} value={s.id}>{s.name}</option>)
@@ -35,25 +37,50 @@ class App extends Component {
       if (s.id == e.target.value)
         return s;
     });
+    // Set the selected country to state
     if (selectedCountries.length > 0) {
       this.setState({ selectedCountry: selectedCountries[0] })
+    }
+    else{
+      this.setState({ selectedCountry: {} })
     }
   }
 
   handleWishlistClick(s) {
-    console.log(s);
+    // Action trigger to store the selected country to store.
+    this.props.addUserWishListCountry(s);
   }
 
   countryThreatLevel() {
+    const {userWishListCountries}=this.props;
+    // Country threat level check and perform necessary actions.
     var selectedCountry = this.state.selectedCountry;
-
     if (selectedCountry.threatLevel == 1 || selectedCountry.threatLevel == 2) {
-      return (<div><button className="btn btn-primary" type="button" onClick={(e) => { this.handleWishlistClick(selectedCountry,e) }}>Add to WishList</button></div>)
+      return (<div><button className="btn btn-primary" type="button" onClick={(e) => { this.handleWishlistClick(selectedCountry, e) }}>Add to WishList</button></div>)
     }
-    else {
+    else if(selectedCountry.threatLevel == 3 || selectedCountry.threatLevel == 4) {
+      alert(selectedCountry.threatText);
       return (<span className="danger">{selectedCountry.threatText}</span>)
     }
+  }
 
+  displaySelectedCountry(){
+    // display selected country 
+    const { selectedCountry } = this.state;
+    if(selectedCountry.name)
+       return(<div className="form-group">
+       <label className="mr-2">Selected Country: </label>
+       <label className="">{this.state.selectedCountry.name}</label>
+     </div>)
+     else 
+       return null;
+  }
+
+  displayUserSelectedCountries(){
+    const {userWishListCountries}=this.props;
+    return userWishListCountries.map(s=>{
+      return(<tr><td> {s.name} </td></tr>)
+    });
   }
 
   render() {
@@ -61,28 +88,36 @@ class App extends Component {
       <div className="App">
         <header>
         </header>
-        <section>
+        <section className="mt-2">
           <div className="container">
             <div className="row">
-              <form>
-                <div className="form-group">
-                  <label htmlFor="countryDrpDown" className="">Country</label>
-                  <select ref="selectedCountry" className="form-control" id="countryDrpDown" onChange={(e) => this.handleCountryDrpChange(e)}>
-                    <option value="0">--Select Country--</option>
-                    {this.bindCountriesToDropDown()}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label className="mr-2">Selected Country: </label>
-                  <label className="">{this.state.selectedCountry.name}</label>
-                </div>
-                <div className="form-group">
-                   {this.countryThreatLevel()}
-                </div>
-              </form>
-              <table>
-
+              <div className="card p-4">
+                <form>
+                  <div className="form-group">
+                    <label htmlFor="countryDrpDown" className="">Country</label>
+                    <select ref="selectedCountry" className="form-control" id="countryDrpDown" onChange={(e) => this.handleCountryDrpChange(e)}>
+                      <option value="0">--Select Country--</option>
+                      {this.bindCountriesToDropDown()}
+                    </select>
+                  </div>
+                  {this.displaySelectedCountry()}
+                  <div className="form-group">
+                    {this.countryThreatLevel()}
+                  </div>
+                </form>
+              </div>
+              <div className="card p-4 y-overflow">
+              <table className="table table-striped">
+              <thead>
+                  <tr>
+                    <th>User Countries list</th>
+                 </tr>
+             </thead>
+             <tbody>
+                {this.displayUserSelectedCountries()}
+             </tbody>  
               </table>
+              </div> 
             </div>
           </div>
         </section>
@@ -98,6 +133,7 @@ class App extends Component {
 const mapDispatchToProps = dispatch => {
   return {
     getCountriesAndThreatLevels: (url) => dispatch(getCountriesAndThreatLevels(url)),
+    addUserWishListCountry:(country) => dispatch(addUserWishListCountry(country))
   }
 }
 

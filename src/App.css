@@ -1,6 +1,21 @@
 .App {
   text-align: center;
 }
+body{
+ background-color: lightgray !important;
+}
+header{
+  min-height: 80px;
+  background-color: grey;
+}
+.container{
+  min-height: 500px;
+}
+
+.y-overflow{
+  max-height: 300px;
+  overflow-y: scroll;
+}
 
 .App-logo {
   animation: App-logo-spin infinite 20s linear;
