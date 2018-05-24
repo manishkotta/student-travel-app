@@ -5,8 +5,8 @@ const GET_COUNTRIES_AND_THREAT_LEVELS = "GET_COUNTRIES_AND_THREAT_LEVELS";
  */
 
 export function getCountriesAndThreatLevels(url) {
-    dispatch =>
-        fetch("https://web-travel-test.cc.uic.edu/countries", {
+   return dispatch =>
+        fetch(url, {
             method: "GET"
         }).then(res => res.json())
             .then(countries => {
@@ -26,14 +26,14 @@ export function getCountriesAndThreatLevels(url) {
 
 var initialState = {
     countries: [],
-    userCountries: []
+    userWishListCountries: []
 }
 
 export function studentReducer(state = initialState, action) {
 
     switch (action.type) {
         case GET_COUNTRIES_AND_THREAT_LEVELS:
-            return Object.assign({}, state, { countries: [...action.values] });
+            return Object.assign({}, state, { countries: [...action.value] });
         default:
             return state;
     }
